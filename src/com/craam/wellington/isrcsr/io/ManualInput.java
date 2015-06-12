@@ -39,15 +39,17 @@ public class ManualInput implements IInput{
 				      .setMagneticField(map.get("bmagco"))
 				      .setSize(map.get("scsize"))
 				      .setHeight(map.get("scheight"))
-				      .setPlasmaDensity(map.get("npco"));
+				      .setPlasmaDensity(map.get("npco"))
+				      .setMicrobunchSize(map.get("tb"));
 				      
 		this.inputData.getExtendedSource()
 					 .setViewAngle(map.get("angle").intValue())
 					 .setMagneticField(map.get("bmagex"))
 					 .setSize(map.get("sesize"))
 					 .setHeight(map.get("seheight"))
-					 .setPlasmaDensity(map.get("npex"));
-
+					 .setPlasmaDensity(map.get("npex"))
+					 .setMicrobunchSize(map.get("tb"));
+		
 
 		try{ this.inputData.setViewAngle(map.get("angle").intValue()); }
 		catch(Exception e){}
@@ -56,6 +58,11 @@ public class ManualInput implements IInput{
 	
 	public InputData getInputData(){
 		return this.inputData;
+	}
+	
+	public ManualInput setUseRazin(Boolean useRazin){
+		this.inputData.setUseRazin(useRazin);
+		return this;
 	}
 
 }

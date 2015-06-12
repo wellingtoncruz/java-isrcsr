@@ -1,6 +1,5 @@
 package com.craam.wellington.isrcsr.io;
 
-import com.craam.wellington.isrcsr.Microbunch;
 import com.craam.wellington.isrcsr.Source;
 import com.craam.wellington.statics.Constants;
 import com.craam.wellington.statics.Messages;
@@ -28,8 +27,7 @@ public final class InputData {
 	
 	private Source extendedSource;
 	private Source compactSource;
-	private Microbunch microbunch;
-
+	private Boolean useRazin = true;
 
 	public InputData() {
 		extendedSource = new Source();
@@ -84,6 +82,11 @@ public final class InputData {
 	public Double getMicrobunchingWidth() {
 		return microbunchingWidth;
 	}
+	
+	public Boolean getUseRazin(){
+		return this.useRazin;
+	}
+	
 	public InputData setEnergyEspectrum(Double energyEspectrum) {
 		this.energyEspectrum = energyEspectrum;
 		return this;
@@ -134,7 +137,12 @@ public final class InputData {
 	}
 	public InputData setMicrobunchingWidth(Double microbunchingWidth) {
 		this.microbunchingWidth = microbunchingWidth;
-		this.microbunch = new Microbunch(microbunchingWidth);
+		return this;
+	}
+	public InputData setUseRazin(Boolean useRazin){
+		this.useRazin = useRazin;
+		this.compactSource.setUseRazin(useRazin);
+		this.extendedSource.setUseRazin(useRazin);
 		return this;
 	}
 	
@@ -148,8 +156,5 @@ public final class InputData {
 		return this.extendedSource;
 	}
 	
-	public Microbunch getMicrobunch(){
-		return this.microbunch;
-	}
 
 }
