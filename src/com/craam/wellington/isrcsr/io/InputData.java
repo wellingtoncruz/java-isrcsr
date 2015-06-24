@@ -1,5 +1,7 @@
 package com.craam.wellington.isrcsr.io;
 
+import com.craam.wellington.isrcsr.Enviroment;
+import com.craam.wellington.isrcsr.Microbunch;
 import com.craam.wellington.isrcsr.Source;
 import com.craam.wellington.statics.Constants;
 import com.craam.wellington.statics.Messages;
@@ -27,13 +29,35 @@ public final class InputData {
 	
 	private Source extendedSource;
 	private Source compactSource;
+	private Microbunch microbunch;
+	
+	private Enviroment enviromentExtendedSource;
+	private Enviroment enviromentCompactSource;
+	
 	private Boolean useRazin = true;
 
 	public InputData() {
-		extendedSource = new Source();
-		compactSource = new Source();
+		enviromentCompactSource = new Enviroment();
+		enviromentExtendedSource = new Enviroment();
 	}
 	
+	public InputData setEnviromentCompactSource(Double bmag, Double np){
+		this.enviromentCompactSource.setMagneticField(bmag).setPlasmaDensity(np);
+		this.compactSource = new Source(enviromentCompactSource);
+		return this;
+	}
+
+	public InputData setEnviromentExtendedSource(Double bmag, Double np){
+		this.enviromentExtendedSource.setMagneticField(bmag).setPlasmaDensity(np);
+		this.extendedSource = new Source(enviromentExtendedSource);
+		return this;
+	}
+	
+	public InputData setMicrobunch(Double tb, Source source){
+		this.microbunch = new Microbunch(source.getEnviroment());
+		return this;
+	}
+
 	public Double getEnergyEspectrum() {
 		return energyEspectrum;
 	}
@@ -143,6 +167,7 @@ public final class InputData {
 		this.useRazin = useRazin;
 		this.compactSource.setUseRazin(useRazin);
 		this.extendedSource.setUseRazin(useRazin);
+		this.microbunch.setUseRazin(useRazin);
 		return this;
 	}
 	
@@ -155,6 +180,17 @@ public final class InputData {
 	public Source getExtendedSource(){
 		return this.extendedSource;
 	}
+
+	public Microbunch getMicrobunch(){
+		return this.microbunch;
+	}
+
+	public Enviroment getEnviromentCompactSource(){
+		return this.enviromentCompactSource;
+	}
 	
+	public Enviroment getEnviromentExtendedSource(){
+		return this.enviromentExtendedSource;
+	}
 
 }

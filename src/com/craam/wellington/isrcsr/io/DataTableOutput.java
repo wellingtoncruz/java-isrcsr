@@ -57,8 +57,8 @@ public class DataTableOutput implements IOutput {
 			printer.println("\n" + Constants.DATA_TABLE_REPORT_PARAMS_CSOURCE);
 			printer.print("size=    " + String.format("%.16e", params.getCompactSource().getSize()) + "    ");
 			printer.print("\t\theight=  " + String.format("%.16e", params.getCompactSource().getHeight()) + "    ");
-			printer.print("\t\tbmag=    " + String.format("%.16e", params.getCompactSource().getMagneticField()) + "G   ");
-			printer.println("\t\tnp=      " + String.format("%.16e", params.getCompactSource().getPlasmaDensity()) + "    ");
+			printer.print("\t\tbmag=    " + String.format("%.16e", params.getCompactSource().getEnviroment().getMagneticField()) + "G   ");
+			printer.println("\t\tnp=      " + String.format("%.16e", params.getCompactSource().getEnviroment().getPlasmaDensity()) + "    ");
 			printer.print("NTotal=  " + String.format("%.16e", params.getCompactSource().getTotalElectronISR()) + "    ");
 			printer.print("\t\tNLow=    " + String.format("%.16e", params.getCompactSource().getLowEnergyElectronISR()) + "    ");
 			printer.println("\t\tNHigh=   " + String.format("%.16e", params.getCompactSource().getHighEnergyElectronISR()) + "    ");
@@ -66,8 +66,8 @@ public class DataTableOutput implements IOutput {
 			printer.println("\n" + Constants.DATA_TABLE_REPORT_PARAMS_ESOURCE);
 			printer.print("size=    " + String.format("%.16e", params.getExtendedSource().getSize()) + "    ");
 			printer.print("\t\theight=  " + String.format("%.16e", params.getExtendedSource().getHeight()) + "    ");
-			printer.print("\t\tbmag=    " + String.format("%.16e", params.getExtendedSource().getMagneticField()) + "G   ");
-			printer.println("\t\tnp=      " + String.format("%.16e", params.getExtendedSource().getPlasmaDensity()) + "    ");
+			printer.print("\t\tbmag=    " + String.format("%.16e", params.getExtendedSource().getEnviroment().getMagneticField()) + "G   ");
+			printer.println("\t\tnp=      " + String.format("%.16e", params.getExtendedSource().getEnviroment().getPlasmaDensity()) + "    ");
 			printer.print("NTotal=  " + String.format("%.16e", params.getExtendedSource().getTotalElectronISR()) + "    ");
 			printer.print("\t\tNLow=    " + String.format("%.16e", params.getExtendedSource().getLowEnergyElectronISR()) + "    ");
 			printer.println("\t\tNHigh=   " + String.format("%.16e", params.getExtendedSource().getHighEnergyElectronISR()) + "    ");
@@ -110,7 +110,7 @@ public class DataTableOutput implements IOutput {
 			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getExtraordISREmissivity()) + "\t\t");
 			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getOrdISRAbsorption()) + "\t\t");
 			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getExtraordISRAbsorption()) + "\t\t");
-			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getStokesAndPolarization().getEmissivityISRPolarization()) + "\t\t");
+			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getStokes().getISREmissivityPolarization()) + "\t\t");
 			p.println(k++);
 		}
 		
@@ -126,10 +126,10 @@ public class DataTableOutput implements IOutput {
 		while(i.hasNext()){
 			Frequency freq = (Frequency) i.next();
 			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getFrequencyValue()) + "\t\t");
-			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getStokesAndPolarization().getPhiISROrd() * Constants.ERGCMSHZ_TO_SFU+1e-23) + "\t\t");
-			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getStokesAndPolarization().getPhiISRExtraord() * Constants.ERGCMSHZ_TO_SFU+1e-23) + "\t\t");
-			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getStokesAndPolarization().getPhiISRTotal() * Constants.ERGCMSHZ_TO_SFU+1e-23) + "\t\t");
-			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getStokesAndPolarization().getFluxPolarizationISR()) + "\t\t");
+			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getFluxes().getPhiOrd() * Constants.ERGCMSHZ_TO_SFU+1e-23) + "\t\t");
+			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getFluxes().getPhiExtraord() * Constants.ERGCMSHZ_TO_SFU+1e-23) + "\t\t");
+			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getFluxes().getPhiTotal() * Constants.ERGCMSHZ_TO_SFU+1e-23) + "\t\t");
+			p.print(String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getFluxes().getFluxPolarization()) + "\t\t");
 			p.println(k++);
 		}
 

@@ -23,6 +23,14 @@ public class ManualInput implements IInput{
 		
 		this.inputData = new InputData();
 		
+		this.inputData.setEnviromentCompactSource(
+					  	map.get("bmagco"),
+					  	map.get("npco"));
+		
+		this.inputData.setEnviromentExtendedSource(
+			  			map.get("bmagex"),
+			  			map.get("npex"));
+		
 		this.inputData.setEnergyEspectrum(map.get("ex"))
 				      .setElectronNumber(map.get("ntotal"))
 				      .setHighestFrequency(map.get("kf").intValue())
@@ -36,21 +44,24 @@ public class ManualInput implements IInput{
 				      
 		this.inputData.getCompactSource()
 					  .setViewAngle(map.get("angle").intValue())
-				      .setMagneticField(map.get("bmagco"))
-				      .setSize(map.get("scsize"))
-				      .setHeight(map.get("scheight"))
-				      .setPlasmaDensity(map.get("npco"))
-				      .setMicrobunchSize(map.get("tb"));
+				      .setHeight(map.get("scheight"));
+		
+		this.inputData.getCompactSource().setSize(map.get("scsize"));
 				      
 		this.inputData.getExtendedSource()
-					 .setViewAngle(map.get("angle").intValue())
-					 .setMagneticField(map.get("bmagex"))
-					 .setSize(map.get("sesize"))
-					 .setHeight(map.get("seheight"))
-					 .setPlasmaDensity(map.get("npex"))
-					 .setMicrobunchSize(map.get("tb"));
+					  .setViewAngle(map.get("angle").intValue())
+					  .setHeight(map.get("seheight"));
 		
-
+		this.inputData.getExtendedSource().setSize(map.get("sesize"));
+		
+		this.inputData.setMicrobunch(
+					   map.get("tb"),
+					   this.inputData.getCompactSource());
+		
+		this.inputData.getMicrobunch()
+					  .setSize(map.get("tb"))
+					  .setViewAngle(map.get("angle").intValue());
+		
 		try{ this.inputData.setViewAngle(map.get("angle").intValue()); }
 		catch(Exception e){}
 	

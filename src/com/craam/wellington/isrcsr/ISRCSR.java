@@ -17,6 +17,7 @@ public class ISRCSR implements IAlgorithm {
 	private Double normalizeFactor, lowEnergyElectron, highEnergyElectron;
 	private Double CSRElectronNumber;
 	private Source compactSource, extendedSource;
+	private Microbunch microbunch;
 	
 	private List<Frequency> frequencies = new ArrayList<Frequency>();
 	
@@ -30,8 +31,9 @@ public class ISRCSR implements IAlgorithm {
 		
 		this.compactSource = this.inputData.getCompactSource();
 		this.extendedSource = this.inputData.getExtendedSource();
+		this.microbunch = this.inputData.getMicrobunch();
 		
-		this.normalizeFactor = this.IntegrateEnergy();
+		this.normalizeFactor = this.getNormalizeFactor();
 		this.LowHighEnergyElectrons();
 		
 		this.extendedSource.setLowEnergyElectronISR(this.inputData.getElectronFractionISRExtendedSource() * this.lowEnergyElectron);
@@ -43,8 +45,8 @@ public class ISRCSR implements IAlgorithm {
 		this.compactSource.setTotalElectronISR(this.compactSource.getLowEnergyElectronISR() + this.compactSource.getHighEnergyElectronISR());
 		
 		this.CSRElectronNumber = this.inputData.getElectronFractionCSR() * this.highEnergyElectron;
-		this.compactSource.setHighEnergyElectronCSR(this.CSRElectronNumber);
-		this.extendedSource.setHighEnergyElectronCSR(this.CSRElectronNumber);
+		this.microbunch.setHighEnergyElectronCSR(this.CSRElectronNumber);
+		this.microbunch.setHighEnergyElectronCSR(this.CSRElectronNumber);
 		
 		//Loop em frequências
 		for(int k=1; k<=inputData.getHighestFrequency(); k++){
@@ -60,7 +62,7 @@ public class ISRCSR implements IAlgorithm {
 	
 	}
 	
-	private Double IntegrateEnergy(){
+	private Double getNormalizeFactor(){
 		Double xnorm = 0.;
 		
 		for(int i=this.inputData.getEnergyLower(); i<=this.inputData.getEnergyUpper(); i++){
@@ -143,14 +145,10 @@ public class ISRCSR implements IAlgorithm {
 			this.setFrequencyValue(Math.pow(10, (0.01*(index-1))) * 1e9);
 			this.formFactor = 1.0 / Math.cosh(Math.PI * inputData.getMicrobunchingWidth() * frequencyValue / 2.0);
 
-			compactSource.getMicrobunch()
-		    .setNormalizedCSRhigh(((1.0 - this.formFactor) + CSRElectronNumber * this.formFactor) * inputData.getElectronFractionCSR() * inputData.getElectronNumber() / normalizeFactor)
-		    .setNormalizedCSRhigh_(inputData.getElectronFractionCSR() * inputData.getElectronNumber() / normalizeFactor);
-
-		    extendedSource.getMicrobunch()
-		    .setNormalizedCSRhigh(((1.0 - this.formFactor) + CSRElectronNumber * this.formFactor) * inputData.getElectronFractionCSR() * inputData.getElectronNumber() / normalizeFactor)
-		    .setNormalizedCSRhigh_(inputData.getElectronFractionCSR() * inputData.getElectronNumber() / normalizeFactor);
-
+			microbunch.addFrequency(index, frequencyValue, inputData.getEnergyLower(), inputData.getEnergyUpper(), inputData.getEnergyEspectrum(), inputData.getEnergyTreshould(), inputData.getMicrobunchingTreshould(),
+			(((1.0 - this.formFactor) + CSRElectronNumber * this.formFactor) * inputData.getElectronFractionCSR() * inputData.getElectronNumber() / normalizeFactor),
+			(inputData.getElectronFractionCSR() * inputData.getElectronNumber() / normalizeFactor));
+			
 			extendedSource.addFrequency(index, frequencyValue, inputData.getEnergyLower(), inputData.getEnergyUpper(), inputData.getEnergyEspectrum(), inputData.getEnergyTreshould(), inputData.getMicrobunchingTreshould(),
 			(inputData.getElectronFractionISRExtendedSource() * inputData.getElectronNumber() / normalizeFactor),
 		    (inputData.getElectronFractionISRExtendedSource() * inputData.getElectronNumber() / normalizeFactor));
@@ -169,10 +167,10 @@ public class ISRCSR implements IAlgorithm {
 		    this.extraordISRAbsorptionLow = compactSource.getFrequency(index).getExtraordISRAbsorptionLow() + extendedSource.getFrequency(index).getExtraordISRAbsorptionLow();
 		    this.extraordISREmissivityHigh = compactSource.getFrequency(index).getExtraordISRAbsorptionHigh() + extendedSource.getFrequency(index).getExtraordISRAbsorptionHigh();		    
 		    
-		    this.ordCSREmissivity = compactSource.getFrequency(index).getOrdCSREmissivity() + extendedSource.getFrequency(index).getOrdCSREmissivity();
-		    this.extraordCSREmissivity = compactSource.getFrequency(index).getExtraordCSREmissivity() + extendedSource.getFrequency(index).getExtraordCSREmissivity();
-		    this.ordCSRAbsorption = compactSource.getFrequency(index).getOrdCSRAbsorption() + extendedSource.getFrequency(index).getOrdCSRAbsorption();
-		    this.extraordCSRAbsorption = compactSource.getFrequency(index).getExtraordCSRAbsorption() + extendedSource.getFrequency(index).getExtraordCSRAbsorption();
+		    this.ordCSREmissivity = microbunch.getFrequency(index).getOrdCSREmissivity();
+		    this.extraordCSREmissivity = microbunch.getFrequency(index).getExtraordCSREmissivity();
+		    this.ordCSRAbsorption = microbunch.getFrequency(index).getOrdCSRAbsorption();
+		    this.extraordCSRAbsorption = microbunch.getFrequency(index).getExtraordCSRAbsorption();
 
 		    this.ordISREmissivity = compactSource.getFrequency(index).getOrdISREmissivity() + extendedSource.getFrequency(index).getOrdISREmissivity();
 		    this.extraordISREmissivity = compactSource.getFrequency(index).getExtraordISREmissivity() + extendedSource.getFrequency(index).getExtraordISREmissivity();
@@ -197,28 +195,28 @@ public class ISRCSR implements IAlgorithm {
 				this.emissivityPolarization = 0.;
 			}
 			
-			this.phiISR = compactSource.getFrequency(index).getStokesAndPolarization().getPhiISRTotal() + extendedSource.getFrequency(index).getStokesAndPolarization().getPhiISRTotal();
-			this.phiCSR = extendedSource.getFrequency(index).getStokesAndPolarization().getPhiCSRTotal();
+			this.phiISR = compactSource.getFrequency(index).getFluxes().getPhiTotal() + extendedSource.getFrequency(index).getFluxes().getPhiTotal();
+			this.phiCSR = microbunch.getFrequency(index).getFluxes().getPhiCSRTotal();
 			
-			this.phiLow = compactSource.getFrequency(index).getStokesAndPolarization().getPhiISRTotalLow() + extendedSource.getFrequency(index).getStokesAndPolarization().getPhiISRTotalLow();
-			this.phiHigh = compactSource.getFrequency(index).getStokesAndPolarization().getPhiISRTotalHigh() + extendedSource.getFrequency(index).getStokesAndPolarization().getPhiISRTotalHigh() + extendedSource.getFrequency(index).getStokesAndPolarization().getPhiCSROrd()  + extendedSource.getFrequency(index).getStokesAndPolarization().getPhiCSRExtraord();
+			this.phiLow = compactSource.getFrequency(index).getFluxes().getPhiTotalLow() + extendedSource.getFrequency(index).getFluxes().getPhiTotalLow();
+			this.phiHigh = compactSource.getFrequency(index).getFluxes().getPhiTotalHigh() + extendedSource.getFrequency(index).getFluxes().getPhiTotalHigh() + microbunch.getFrequency(index).getFluxes().getPhiOrd()  + microbunch.getFrequency(index).getFluxes().getPhiExtraord();
 			
-			this.phiOrdISR = compactSource.getFrequency(index).getStokesAndPolarization().getPhiISROrd() + extendedSource.getFrequency(index).getStokesAndPolarization().getPhiISROrd();
-			this.phiExtraordISR = compactSource.getFrequency(index).getStokesAndPolarization().getPhiISRExtraord() + extendedSource.getFrequency(index).getStokesAndPolarization().getPhiISRExtraord();
+			this.phiOrdISR = compactSource.getFrequency(index).getFluxes().getPhiOrd() + extendedSource.getFrequency(index).getFluxes().getPhiOrd();
+			this.phiExtraordISR = compactSource.getFrequency(index).getFluxes().getPhiExtraord() + extendedSource.getFrequency(index).getFluxes().getPhiExtraord();
 
-			this.phiOrdCSR = extendedSource.getFrequency(index).getStokesAndPolarization().getPhiCSROrd();
-			this.phiExtraordCSR = extendedSource.getFrequency(index).getStokesAndPolarization().getPhiCSRExtraord();
+			this.phiOrdCSR = microbunch.getFrequency(index).getFluxes().getPhiOrd();
+			this.phiExtraordCSR = microbunch.getFrequency(index).getFluxes().getPhiExtraord();
 
-			this.phiOrd = this.phiOrdISR + extendedSource.getFrequency(index).getStokesAndPolarization().getPhiCSROrd();
-			this.phiExtraord = this.phiExtraordISR + extendedSource.getFrequency(index).getStokesAndPolarization().getPhiCSRExtraord();
+			this.phiOrd = this.phiOrdISR + microbunch.getFrequency(index).getFluxes().getPhiOrd();
+			this.phiExtraord = this.phiExtraordISR + microbunch.getFrequency(index).getFluxes().getPhiExtraord();
 			
 			this.phiTotal = this.phiOrd + this.phiExtraord;
 			
-			this.QISR = compactSource.getFrequency(index).getStokesAndPolarization().getQISR() + extendedSource.getFrequency(index).getStokesAndPolarization().getQISR();
-			this.VISR = compactSource.getFrequency(index).getStokesAndPolarization().getVISR() + extendedSource.getFrequency(index).getStokesAndPolarization().getVISR();
+			this.QISR = compactSource.getFrequency(index).getStokes().getQ() + extendedSource.getFrequency(index).getStokes().getQ();
+			this.VISR = compactSource.getFrequency(index).getStokes().getV() + extendedSource.getFrequency(index).getStokes().getV();
 			
-			this.QCSR = extendedSource.getFrequency(index).getStokesAndPolarization().getQCSR();
-			this.VCSR = extendedSource.getFrequency(index).getStokesAndPolarization().getVCSR();
+			this.QCSR = extendedSource.getFrequency(index).getStokes().getQ();
+			this.VCSR = extendedSource.getFrequency(index).getStokes().getV();
 			
 			this.Q = this.QISR + this.QCSR;
 			this.V = this.VISR + this.VCSR;
@@ -416,7 +414,7 @@ public class ISRCSR implements IAlgorithm {
 		}
 
 	}
-	
+
 	public Frequency addFrequency(Integer index){
 		Frequency frequency = new Frequency(index);
 		this.frequencies.add(frequency);

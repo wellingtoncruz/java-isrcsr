@@ -71,7 +71,7 @@ public class CSVOutput implements IOutput {
 				Frequency freq = (Frequency) i.next();
 
 				if(exportFrequency) row += String.format("%.16e;\t", s.getFrequency(freq.getFrequencyIndex()).getFrequencyValue());
-				                    row += String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getStokesAndPolarization().getPhiISRTotal() * Constants.ERGCMSHZ_TO_SFU+1e-23);
+				                    row += String.format("%.16e", s.getFrequency(freq.getFrequencyIndex()).getFluxes().getPhiTotal() * Constants.ERGCMSHZ_TO_SFU+1e-23);
 				printer.println(row);
 			}
 			printer.close();
